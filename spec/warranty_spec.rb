@@ -11,7 +11,7 @@ RSpec.describe Warranty do
           to_return(read_fixture(imei))
 
         warranty = Warranty.new(imei)
-        expiration_date = Date.new('2015, 8, 10')
+        expiration_date = Date.new(2015, 8, 10)
         expect(warranty.expiration_date).to eq(expiration_date)
       end
     end
