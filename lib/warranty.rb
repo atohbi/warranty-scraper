@@ -1,14 +1,16 @@
 require 'open-uri'
 
 class ParsingError < StandardError; end
-class InvalidImeiError < StandardError; end
+class LookupError < StandardError; end
 
+# Class for scraping service and support data from Apple's selfsolve pages.
 class Warranty
 
   def initialize(imei)
     @imei = imei
   end
 
+  # Returns expiration date or nil if warranty has expired.
   def expiration_date
     @expiration_date ||= extract_warranty_date
   end
@@ -31,10 +33,14 @@ class Warranty
       if matches = $1.match(/Expiration Date\:\s*(.*\D\d{4})\D/)
         Date.parse(matches[0])
       else
-        raise(ParsingError, 'Can\'t parse the page')
+        raise(ParsingError, 'Error parsing page content')
       end
+    when /warrantyPage.warrantycheck.displayHWSupportInfo\s*\(\s*false/
+      nil
+    when /warrantyPage\.warrantycheck\.showErrors/
+      raise(LookupError)
     else
-      raise(ParsingError, 'Can\'t parse the page')
+      raise(ParsingError, 'Error parsing page content')
     end
   end
 

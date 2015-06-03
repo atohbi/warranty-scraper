@@ -19,6 +19,33 @@ RSpec.describe Warranty do
       end
     end
 
+    context 'for IMEI with expired warranty' do
+      before do
+        @imei = '013896000639712'
+        stub_request(:get, "https://selfsolve.apple.com/wcResults.do"\
+          "?sn=#{@imei}&num=0").to_return(read_fixture(@imei))
+      end
+
+      it 'returns nil' do
+        warranty = Warranty.new(@imei)
+
+        expect(warranty.expiration_date).to be(nil)
+      end
+    end
+
+    context 'for IMEI with no information' do
+      before do
+        @imei = '013977000323'
+        stub_request(:get, "https://selfsolve.apple.com/wcResults.do"\
+          "?sn=#{@imei}&num=0").to_return(read_fixture(@imei))
+      end
+
+      it 'returns LookupError' do
+        warranty = Warranty.new(@imei)
+        expect { warranty.expiration_date }.to raise_error(LookupError)
+      end
+    end
+
   end
 
 end
