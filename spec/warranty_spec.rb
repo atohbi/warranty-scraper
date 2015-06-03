@@ -29,7 +29,7 @@ RSpec.describe Warranty do
       it 'returns nil' do
         warranty = Warranty.new(@imei)
 
-        expect(warranty.expiration_date).to be(nil)
+        expect(warranty.expiration_date).to be_nil
       end
     end
 

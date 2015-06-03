@@ -3,7 +3,11 @@ require 'open-uri'
 class ParsingError < StandardError; end
 class LookupError < StandardError; end
 
-# Class for scraping service and support data from Apple's selfsolve pages.
+# Class for scraping Apple's self solve site.
+# Currently only getting warranty expiration date is implemented:
+#
+#   Warranty.new('013977000323877').expiration_date
+#
 class Warranty
 
   def initialize(imei)
@@ -29,13 +33,13 @@ class Warranty
 
   def extract_warranty_date
     case details
-    when /warrantyPage.warrantycheck.displayHWSupportInfo\s*\(\s*true(.*)\)\;/
+    when /warrantyPage\.warrantycheck\.displayHWSupportInfo\s*\(\s*true(.*)\)\;/
       if matches = $1.match(/Expiration Date\:\s*(.*\D\d{4})\D/)
         Date.parse(matches[0])
       else
         raise(ParsingError, 'Error parsing page content')
       end
-    when /warrantyPage.warrantycheck.displayHWSupportInfo\s*\(\s*false/
+    when /warrantyPage\.warrantycheck\.displayHWSupportInfo\s*\(\s*false/
       nil
     when /warrantyPage\.warrantycheck\.showErrors/
       raise(LookupError)
